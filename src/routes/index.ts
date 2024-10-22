@@ -4,8 +4,9 @@ import secureHTML from "../utils/secureHTML";
 import moment from "moment";
 import weekColor from "../utils/weekColor";
 import urlToBase64 from "../utils/urlToBase64";
+import skills from "./skills";
 
-export default new Elysia({ prefix: "/api/:username" }).get(
+export default new Elysia({ prefix: "/api/:username" }).use(skills).get(
   "/",
   async ({ set, params }) => {
     const user = await User.fromUsername(params.username).getGlobalInfo();

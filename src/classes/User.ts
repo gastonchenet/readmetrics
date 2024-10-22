@@ -11,6 +11,7 @@ export type GlobalInfoWeek = {
 };
 
 export type GlobalInfo = {
+  error?: { message: string };
   data: {
     user: {
       name: string;
@@ -29,6 +30,32 @@ export type GlobalInfo = {
           totalContributions: number;
           weeks: GlobalInfoWeek[];
         };
+      };
+    };
+  };
+};
+
+export type Skills = {
+  error?: { message: string };
+  data: {
+    user: {
+      repositories: {
+        nodes: {
+          primaryLanguage: {
+            name: string;
+            color: string;
+          };
+          languages: {
+            totalSize: number;
+            edges: {
+              size: number;
+              node: {
+                name: string;
+                color: string;
+              };
+            }[];
+          };
+        }[];
       };
     };
   };
@@ -98,13 +125,55 @@ export default class User {
       body: JSON.stringify({ query: query.loc!.source.body }),
     });
 
-    if (!response.ok) {
-      console.error(await response.text());
+    const json: GlobalInfo = await response.json();
+
+    if (json.error) {
+      console.error(json.error.message);
       return null;
     }
 
-    const json: GlobalInfo = await response.json();
-    if (json?.data?.user === null) return null;
-    return json.data.user;
+    return json?.data?.user ?? null;
+  }
+
+  public async getSkills() {
+    const query = gql`
+      query {
+        user(login: "${this.username}") {
+          repositories(first: 100, ownerAffiliations: OWNER) {
+            nodes {
+              primaryLanguage {
+                name
+                color
+              }
+              languages(first: 100, orderBy: { field: SIZE, direction: DESC }) {
+                totalSize
+                edges {
+                  size
+                  node {
+                    name
+                    color
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    const response = await fetch("https://api.github.com/graphql", {
+      method: "POST",
+      headers: { Authorization: User.Authorization },
+      body: JSON.stringify({ query: query.loc!.source.body }),
+    });
+
+    const json: Skills = await response.json();
+
+    if (json.error) {
+      console.error(json.error.message);
+      return null;
+    }
+
+    return json?.data?.user ?? null;
   }
 }
