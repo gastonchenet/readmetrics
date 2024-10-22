@@ -98,8 +98,13 @@ export default class User {
       body: JSON.stringify({ query: query.loc!.source.body }),
     });
 
+    if (!response.ok) {
+      console.error(await response.text());
+      return null;
+    }
+
     const json: GlobalInfo = await response.json();
-    if (json.data.user === null) return null;
+    if (json?.data?.user === null) return null;
     return json.data.user;
   }
 }

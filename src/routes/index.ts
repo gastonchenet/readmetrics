@@ -3,6 +3,7 @@ import User from "../classes/User";
 import secureHTML from "../utils/secureHTML";
 import moment from "moment";
 import weekColor from "../utils/weekColor";
+import urlToBase64 from "../utils/urlToBase64";
 
 export default new Elysia({ prefix: "/api/:username" }).get(
   "/",
@@ -19,7 +20,7 @@ export default new Elysia({ prefix: "/api/:username" }).get(
       <foreignObject x="0" y="0" width="100%" height="100%">
         <div xmlns="http://www.w3.org/1999/xhtml" class="container">
           <h2 class="header">
-            <img class="avatar" src="${secureHTML(
+            <img class="avatar" src="${await urlToBase64(
               user.avatarUrl
             )}" alt="Avatar" />
             <span class="text">${secureHTML(user.name)}</span>
