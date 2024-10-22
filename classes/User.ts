@@ -1,36 +1,33 @@
 import gql from "graphql-tag";
 
-type GlobalInfo = {
+export type GlobalInfoWeek = {
+  contributionDays: {
+    color: string;
+    contributionCount: number;
+    date: string;
+    weekday: number;
+  }[];
+  firstDay: string;
+};
+
+export type GlobalInfo = {
   data: {
     user: {
       name: string;
-      login: string;
-      bio: string;
       avatarUrl: string;
       createdAt: string;
-      updatedAt: string;
       location: string;
-      company: string;
-      pronouns: string;
-      websiteUrl: string;
       repositories: { totalCount: number };
       pullRequests: { totalCount: number };
       issues: { totalCount: number };
       followers: { totalCount: number };
       following: { totalCount: number };
+      starredRepositories: { totalCount: number };
       contributionsCollection: {
         contributionCalendar: {
           colors: string[];
           totalContributions: number;
-          weeks: {
-            contributionDays: {
-              color: string;
-              contributionCount: number;
-              date: string;
-              weekday: number;
-            }[];
-            firstDay: string;
-          }[];
+          weeks: GlobalInfoWeek[];
         };
       };
     };
@@ -55,15 +52,9 @@ export default class User {
       query {
         user(login: "${this.username}") {
           name
-          login
-          bio
           avatarUrl
           createdAt
-          updatedAt
           location
-          company
-          pronouns
-          websiteUrl
           repositories {
             totalCount
           }
@@ -77,6 +68,9 @@ export default class User {
             totalCount
           }
           following {
+            totalCount
+          }
+          starredRepositories {
             totalCount
           }
           contributionsCollection {
