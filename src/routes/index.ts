@@ -5,6 +5,7 @@ import moment from "moment";
 import weekColor from "../utils/weekColor";
 import urlToBase64 from "../utils/urlToBase64";
 import skills from "./skills";
+import viewProfile from "../utils/viewProfile";
 
 export default new Elysia({ prefix: "/api/:username" }).use(skills).get(
 	"/",
@@ -15,6 +16,8 @@ export default new Elysia({ prefix: "/api/:username" }).use(skills).get(
 			set.status = "Not Found";
 			throw new NotFoundError("User not found");
 		}
+
+		const views = viewProfile(params.username);
 
 		const content = `<svg xmlns="http://www.w3.org/2000/svg" width="480" height="225">
       <style>${await Bun.file("./svg/style/main.css").text()}</style>
@@ -48,6 +51,12 @@ export default new Elysia({ prefix: "/api/:username" }).use(skills).get(
               </p>
             </section>
             <section>
+              <p class="line">
+                ${await Bun.file("./assets/images/view.svg").text()}
+                <span>Profile seen <b>${views}</b> time${
+			views > 1 ? "s" : ""
+		}</span>
+              </p>
               <p class="line">
                 ${await Bun.file("./assets/images/location.svg").text()}
                 <span><b>${user.location}</b></span>
