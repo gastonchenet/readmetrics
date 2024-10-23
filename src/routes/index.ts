@@ -7,23 +7,23 @@ import urlToBase64 from "../utils/urlToBase64";
 import skills from "./skills";
 
 export default new Elysia({ prefix: "/api/:username" }).use(skills).get(
-  "/",
-  async ({ set, params }) => {
-    const user = await User.fromUsername(params.username).getGlobalInfo();
+	"/",
+	async ({ set, params }) => {
+		const user = await User.fromUsername(params.username).getGlobalInfo();
 
-    if (!user) {
-      set.status = "Not Found";
-      throw new NotFoundError("User not found");
-    }
+		if (!user) {
+			set.status = "Not Found";
+			throw new NotFoundError("User not found");
+		}
 
-    const content = `<svg xmlns="http://www.w3.org/2000/svg" width="480" height="225">
+		const content = `<svg xmlns="http://www.w3.org/2000/svg" width="480" height="225">
       <style>${await Bun.file("./svg/style/main.css").text()}</style>
       <foreignObject x="0" y="0" width="100%" height="100%">
         <div xmlns="http://www.w3.org/1999/xhtml" class="container">
           <h2 class="header">
             <img class="avatar" src="${await urlToBase64(
-              user.avatarUrl
-            )}" alt="Avatar" />
+							user.avatarUrl
+						)}" alt="Avatar" />
             <span class="text">${secureHTML(user.name)}</span>
           </h2>
           <div class="sections">
@@ -31,8 +31,8 @@ export default new Elysia({ prefix: "/api/:username" }).use(skills).get(
               <p class="line">
                 ${await Bun.file("./assets/images/login.svg").text()}
                 <span>Joined Github on <b>${moment(user.createdAt).format(
-                  "MMM Do, YYYY"
-                )}</b></span>
+									"MMM Do, YYYY"
+								)}</b></span>
               </p>
               <p class="line">
                 ${await Bun.file("./assets/images/following.svg").text()}
@@ -67,28 +67,24 @@ export default new Elysia({ prefix: "/api/:username" }).use(skills).get(
             <span>Weekly contributions</span>
           </p>
           <svg class="commits" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 236 11" width="240" height="11">
-            <g>
-              ${user.contributionsCollection.contributionCalendar.weeks
-                .map(
-                  (week, index) =>
-                    `<rect class="day" x="${
-                      index * 15
-                    }" y="0" width="11" height="11" fill="${weekColor(
-                      week
-                    )}" />`
-                )
-                .join("")}
-            </g>
+            ${user.contributionsCollection.contributionCalendar.weeks
+							.map(
+								(week, index) =>
+									`<rect class="day" x="${
+										index * 15
+									}" y="0" width="11" height="11" fill="${weekColor(week)}" />`
+							)
+							.join("")}
           </svg>
         </div>
       </foreignObject>
     </svg>`;
 
-    return new File([content], "global-info.svg", {
-      type: "image/svg+xml",
-    });
-  },
-  {
-    params: t.Object({ username: t.String() }),
-  }
+		return new File([content], "global-info.svg", {
+			type: "image/svg+xml",
+		});
+	},
+	{
+		params: t.Object({ username: t.String() }),
+	}
 );

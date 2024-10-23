@@ -1,81 +1,82 @@
 import gql from "graphql-tag";
 
 export type GlobalInfoWeek = {
-  contributionDays: {
-    color: string;
-    contributionCount: number;
-    date: string;
-    weekday: number;
-  }[];
-  firstDay: string;
+	contributionDays: {
+		color: string;
+		contributionCount: number;
+		date: string;
+		weekday: number;
+	}[];
+	firstDay: string;
 };
 
 export type GlobalInfo = {
-  error?: { message: string };
-  data: {
-    user: {
-      name: string;
-      avatarUrl: string;
-      createdAt: string;
-      location: string;
-      repositories: { totalCount: number };
-      pullRequests: { totalCount: number };
-      issues: { totalCount: number };
-      followers: { totalCount: number };
-      following: { totalCount: number };
-      starredRepositories: { totalCount: number };
-      contributionsCollection: {
-        contributionCalendar: {
-          colors: string[];
-          totalContributions: number;
-          weeks: GlobalInfoWeek[];
-        };
-      };
-    };
-  };
+	error?: { message: string };
+	data: {
+		user: {
+			name: string;
+			avatarUrl: string;
+			createdAt: string;
+			location: string;
+			repositories: { totalCount: number };
+			pullRequests: { totalCount: number };
+			issues: { totalCount: number };
+			followers: { totalCount: number };
+			following: { totalCount: number };
+			starredRepositories: { totalCount: number };
+			contributionsCollection: {
+				contributionCalendar: {
+					colors: string[];
+					totalContributions: number;
+					weeks: GlobalInfoWeek[];
+				};
+			};
+		};
+	};
 };
 
 export type Skills = {
-  error?: { message: string };
-  data: {
-    user: {
-      repositories: {
-        nodes: {
-          primaryLanguage: {
-            name: string;
-            color: string;
-          };
-          languages: {
-            totalSize: number;
-            edges: {
-              size: number;
-              node: {
-                name: string;
-                color: string;
-              };
-            }[];
-          };
-        }[];
-      };
-    };
-  };
+	error?: { message: string };
+	data: {
+		user: {
+			name: string;
+			repositories: {
+				nodes: {
+					primaryLanguage: {
+						name: string;
+						color: string;
+					};
+					languages: {
+						totalSize: number;
+						edges: {
+							size: number;
+							node: {
+								name: string;
+								color: string;
+							};
+						}[];
+					};
+				}[];
+			};
+		};
+	};
 };
 
 export default class User {
-  private static readonly Authorization = `bearer ${process.env.GITHUB_TOKEN}`;
+	private static readonly Authorization = `bearer ${process.env.GITHUB_TOKEN}`;
 
-  public static fromUsername(username: string) {
-    return new User(username);
-  }
+	public static fromUsername(username: string) {
+		return new User(username);
+	}
 
-  public readonly username: string;
+	public readonly username: string;
 
-  private constructor(username: string) {
-    this.username = username;
-  }
+	private constructor(username: string) {
+		this.username = username;
+	}
 
-  public async getGlobalInfo() {
-    const query = gql`
+	public async getGlobalInfo() {
+		const query = gql`
       query {
         user(login: "${this.username}") {
           name
@@ -119,26 +120,27 @@ export default class User {
       }
     `;
 
-    const response = await fetch("https://api.github.com/graphql", {
-      method: "POST",
-      headers: { Authorization: User.Authorization },
-      body: JSON.stringify({ query: query.loc!.source.body }),
-    });
+		const response = await fetch("https://api.github.com/graphql", {
+			method: "POST",
+			headers: { Authorization: User.Authorization },
+			body: JSON.stringify({ query: query.loc!.source.body }),
+		});
 
-    const json: GlobalInfo = await response.json();
+		const json: GlobalInfo = await response.json();
 
-    if (json.error) {
-      console.error(json.error.message);
-      return null;
-    }
+		if (json.error) {
+			console.error(json.error.message);
+			return null;
+		}
 
-    return json?.data?.user ?? null;
-  }
+		return json?.data?.user ?? null;
+	}
 
-  public async getSkills() {
-    const query = gql`
+	public async getSkills() {
+		const query = gql`
       query {
         user(login: "${this.username}") {
+          name
           repositories(first: 100, ownerAffiliations: OWNER) {
             nodes {
               primaryLanguage {
@@ -161,19 +163,19 @@ export default class User {
       }
     `;
 
-    const response = await fetch("https://api.github.com/graphql", {
-      method: "POST",
-      headers: { Authorization: User.Authorization },
-      body: JSON.stringify({ query: query.loc!.source.body }),
-    });
+		const response = await fetch("https://api.github.com/graphql", {
+			method: "POST",
+			headers: { Authorization: User.Authorization },
+			body: JSON.stringify({ query: query.loc!.source.body }),
+		});
 
-    const json: Skills = await response.json();
+		const json: Skills = await response.json();
 
-    if (json.error) {
-      console.error(json.error.message);
-      return null;
-    }
+		if (json.error) {
+			console.error(json.error.message);
+			return null;
+		}
 
-    return json?.data?.user ?? null;
-  }
+		return json?.data?.user ?? null;
+	}
 }

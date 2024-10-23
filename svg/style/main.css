@@ -22,26 +22,29 @@ b {
 .container {
   padding: 0.6rem;
 }
-.container .header {
+
+.header {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.6rem;
 }
-.container .header .avatar {
+.header .avatar {
   width: 22px;
   height: 22px;
   border-radius: 50%;
 }
-.container .header .text {
+.header .text {
   font-size: 17px;
   font-weight: 600;
 }
-.container .sections {
+
+.sections {
   display: flex;
   gap: 2rem;
 }
-.container .line {
+
+.line {
   color: #97979c;
   display: flex;
   align-items: center;
@@ -49,12 +52,13 @@ b {
   font-size: 14px;
   margin-bottom: 0.3rem;
 }
-.container .line.label {
+.line.label {
   color: #2e87c9;
   margin-block: 0.8rem 0.4rem;
   font-size: 15px;
 }
-.container .day {
+
+.day {
   outline: 1px solid rgba(151, 151, 156, 0.2509803922);
   outline-offset: -1px;
 }
