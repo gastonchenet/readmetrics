@@ -15,6 +15,7 @@
 	.text {
 		font-size: 17px;
 		font-weight: 600;
+		color: $text-important-color;
 	}
 }
 
@@ -24,7 +25,6 @@
 }
 
 .line {
-	color: #97979c;
 	display: flex;
 	align-items: center;
 	gap: 0.4rem;
@@ -32,7 +32,7 @@
 	margin-bottom: 0.3rem;
 
 	&.label {
-		color: #2e87c9;
+		color: $text-important-color;
 		margin-block: 0.8rem 0.4rem;
 		font-size: 15px;
 	}

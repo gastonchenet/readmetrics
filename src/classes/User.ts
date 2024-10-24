@@ -1,12 +1,9 @@
 import gql from "graphql-tag";
+import Config from "./Config";
+import moment from "moment";
 
 export type GlobalInfoWeek = {
-	contributionDays: {
-		color: string;
-		contributionCount: number;
-		date: string;
-		weekday: number;
-	}[];
+	contributionDays: { contributionCount: number }[];
 	firstDay: string;
 };
 
@@ -26,8 +23,6 @@ export type GlobalInfo = {
 			starredRepositories: { totalCount: number };
 			contributionsCollection: {
 				contributionCalendar: {
-					colors: string[];
-					totalContributions: number;
 					weeks: GlobalInfoWeek[];
 				};
 			};
@@ -62,23 +57,45 @@ export type Skills = {
 	};
 };
 
+export type SpotifyInfo = {
+	status?: number;
+	path?: string;
+	message?: string;
+	items: {
+		position: number;
+		streams: number;
+		playedMs: number;
+		track: {
+			albums: {
+				id: number;
+				name: string;
+				image: string;
+			}[];
+			artists: {
+				id: number;
+				name: string;
+				image: string;
+			}[];
+			durationMs: number;
+			explicit: boolean;
+			externalIds: {
+				spotify: string[];
+				appleMusic: string[];
+			};
+			id: number;
+			name: string;
+			spotifyPopularity: number;
+			spotifyPreview: string | null;
+			appleMusicPreview: string | null;
+		};
+	}[];
+};
+
 export default class User {
-	private static readonly Authorization = `bearer ${process.env.GITHUB_TOKEN}`;
-
-	public static fromUsername(username: string) {
-		return new User(username);
-	}
-
-	public readonly username: string;
-
-	private constructor(username: string) {
-		this.username = username;
-	}
-
-	public async getGlobalInfo() {
+	public static async getGlobalInfo() {
 		const query = gql`
       query {
-        user(login: "${this.username}") {
+        user(login: "${Config.GITHUB_USERNAME}") {
           name
           avatarUrl
           createdAt
@@ -103,14 +120,9 @@ export default class User {
           }
           contributionsCollection {
             contributionCalendar {
-              colors
-              totalContributions
               weeks {
                 contributionDays {
-                  color
                   contributionCount
-                  date
-                  weekday
                 }
                 firstDay
               }
@@ -122,7 +134,7 @@ export default class User {
 
 		const response = await fetch("https://api.github.com/graphql", {
 			method: "POST",
-			headers: { Authorization: User.Authorization },
+			headers: { Authorization: `bearer ${Config.GITHUB_TOKEN}` },
 			body: JSON.stringify({ query: query.loc!.source.body }),
 		});
 
@@ -136,10 +148,10 @@ export default class User {
 		return json?.data?.user ?? null;
 	}
 
-	public async getSkills() {
+	public static async getSkills() {
 		const query = gql`
       query {
-        user(login: "${this.username}") {
+        user(login: "${Config.GITHUB_USERNAME}") {
           name
           repositories(first: 100, ownerAffiliations: OWNER) {
             nodes {
@@ -165,7 +177,7 @@ export default class User {
 
 		const response = await fetch("https://api.github.com/graphql", {
 			method: "POST",
-			headers: { Authorization: User.Authorization },
+			headers: { Authorization: `bearer ${Config.GITHUB_TOKEN}` },
 			body: JSON.stringify({ query: query.loc!.source.body }),
 		});
 
@@ -177,5 +189,26 @@ export default class User {
 		}
 
 		return json?.data?.user ?? null;
+	}
+
+	public static async getSpotifyInfo() {
+		const url = new URL(
+			`https://api.stats.fm/api/v1/users/${Config.SPOTIFY_USERNAME}/top/tracks`
+		);
+
+		url.searchParams.set("after", moment().subtract(6, "months").format("x"));
+		url.searchParams.set("before", moment().format("x"));
+		url.searchParams.set("limit", "5");
+
+		const response = await fetch(url.toString());
+
+		const json: SpotifyInfo = await response.json();
+
+		if (!response.ok) {
+			console.error(json.message);
+			return null;
+		}
+
+		return json;
 	}
 }

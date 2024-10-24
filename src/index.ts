@@ -1,6 +1,18 @@
 import Elysia from "elysia";
+import swagger from "@elysiajs/swagger";
 import routes from "./routes";
+import Config from "./classes/Config";
+import cors from "@elysiajs/cors";
 
-new Elysia().use(routes).listen(process.env.PORT!, ({ hostname, port }) => {
-  console.log(`Server running at ${hostname}:${port}`);
-});
+await Config.load();
+
+new Elysia()
+	.use(cors({ origin: "*" }))
+	.use(swagger())
+	.onAfterHandle(({ request }) => {
+		console.log(`[${request.method}] ${new URL(request.url).pathname}`);
+	})
+	.use(routes)
+	.listen(Config.PORT, ({ hostname, port }) => {
+		console.log(`Server running at ${hostname}:${port}`);
+	});

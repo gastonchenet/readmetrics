@@ -1,9 +1,9 @@
 import Elysia, { NotFoundError, t } from "elysia";
+import path from "node:path";
 import User from "../classes/User";
+import Svg from "../classes/Svg";
 import formatBytes from "../utils/formatBytes";
-
-const BAR_WIDTH = 460;
-const FLOAT_ERROR = 1;
+import loadIcon from "../utils/loadIcon";
 
 type Language = {
 	width: number;
@@ -11,10 +11,13 @@ type Language = {
 	color: string;
 };
 
+const BAR_WIDTH = 460;
+const FLOAT_ERROR = 1;
+
 export default new Elysia({ prefix: "/skills" }).get(
 	"/",
-	async ({ set, params }) => {
-		const user = await User.fromUsername(params.username).getSkills();
+	async ({ set }) => {
+		const user = await User.getSkills();
 
 		if (!user) {
 			set.status = "Not Found";
@@ -81,94 +84,92 @@ export default new Elysia({ prefix: "/skills" }).get(
 			Object.entries(languagesWidth).sort((a, b) => b[1].lines - a[1].lines)
 		);
 
-		const content = `<svg xmlns="http://www.w3.org/2000/svg" width="480" height="340">
-      <style>${await Bun.file("./svg/style/skills.css").text()}</style>
-      <foreignObject x="0" y="0" width="100%" height="100%">
-        <div xmlns="http://www.w3.org/1999/xhtml" class="container">
-					<h2 class="title">
-						${user.name}'s skills
-					</h2>
-          <p class="label">
-						${await Bun.file("./assets/images/starred.svg").text()}
-						<span>Most used languages</span>
-					</p>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${BAR_WIDTH} 8" width="${BAR_WIDTH}" height="8px">
-            ${Object.entries(sortedLanguages)
-							.map(
-								([lang, { width }], index) =>
-									`<rect x="${Math.max(
-										0,
-										Object.entries(sortedLanguages)
-											.slice(0, index)
-											.reduce((acc, [_, value]) => acc + value.width, 0) -
-											FLOAT_ERROR
-									)}" y="0" width="${width + FLOAT_ERROR}" height="8" fill="${
-										colors[lang]
-									}" />`
-							)
-							.join("")}
-          </svg>
-					<div class="language-container">
-						${Object.entries(sortedLanguages)
-							.slice(0, 4)
-							.map(
-								([lang, { width, lines, color }]) => `<p class="language">
-							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" height="12px" width="12px">
-								<ellipse cx="6" cy="6" rx="6" ry="6" fill="${color}" />
-							</svg>
-							<span><b>${(Math.round((width / BAR_WIDTH) * 1000) / 10).toLocaleString(
-								"en"
-							)}%</b></span>
-							<span>${lang}</span>
-							<span class="size">${formatBytes(lines)}</span>
-						</p>`
-							)
-							.join("")}
-					</div>
-          <p class="label">
-						${await Bun.file("./assets/images/repo.svg").text()}
-						<span>Most used project main languages</span>
-					</p>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${BAR_WIDTH} 8" width="${BAR_WIDTH}" height="8px">
-            ${Object.entries(sortedPrimaryLanguages)
-							.map(
-								([lang, width], index) =>
-									`<rect x="${Math.max(
-										0,
-										Object.entries(sortedPrimaryLanguages)
-											.slice(0, index)
-											.reduce((acc, [_, value]) => acc + value, 0) - FLOAT_ERROR
-									)}" y="0" width="${width + FLOAT_ERROR}" height="8" fill="${
-										colors[lang]
-									}" />`
-							)
-							.join("")}
-          </svg>
-					<div class="language-container grid">
-						${Object.entries(sortedPrimaryLanguages)
-							.slice(0, 12)
-							.map(
-								([lang, width]) => `<p class="language">
-							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" height="12px" width="12px">
-								<ellipse cx="6" cy="6" rx="6" ry="6" fill="${colors[lang]}" />
-							</svg>
-							<span><b>${(Math.round((width / BAR_WIDTH) * 1000) / 10).toLocaleString(
-								"en"
-							)}%</b></span>
-							<span>${lang}</span>
-						</p>`
-							)
-							.join("")}
-					</div>
-        </div>
-      </foreignObject>
-    </svg>`;
+		const content = `<h2 class="title">
+			${user.name}'s skills
+		</h2>
+		<p class="label">
+			${await loadIcon("starred")}
+			<span>Most used languages</span>
+		</p>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${BAR_WIDTH} 8" width="${BAR_WIDTH}" height="8px">
+			${Object.entries(sortedLanguages)
+				.map(
+					([lang, { width }], index) =>
+						`<rect x="${Math.max(
+							0,
+							Object.entries(sortedLanguages)
+								.slice(0, index)
+								.reduce((acc, [_, value]) => acc + value.width, 0) - FLOAT_ERROR
+						)}" y="0" width="${width + FLOAT_ERROR}" height="8" fill="${
+							colors[lang]
+						}" />`
+				)
+				.join("")}
+		</svg>
+		<div class="language-container">
+			${Object.entries(sortedLanguages)
+				.slice(0, 4)
+				.map(
+					([lang, { width, lines, color }]) => `<p class="language">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" height="12px" width="12px">
+					<ellipse cx="6" cy="6" rx="6" ry="6" fill="${color}" />
+				</svg>
+				<span><b>${(Math.round((width / BAR_WIDTH) * 1000) / 10).toLocaleString(
+					"en"
+				)}%</b></span>
+				<span>${lang}</span>
+				<span class="size">${formatBytes(lines)}</span>
+			</p>`
+				)
+				.join("")}
+		</div>
+		<p class="label">
+			${await loadIcon("repo")}
+			<span>Most used project main languages</span>
+		</p>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${BAR_WIDTH} 8" width="${BAR_WIDTH}" height="8px">
+			${Object.entries(sortedPrimaryLanguages)
+				.map(
+					([lang, width], index) =>
+						`<rect x="${Math.max(
+							0,
+							Object.entries(sortedPrimaryLanguages)
+								.slice(0, index)
+								.reduce((acc, [_, value]) => acc + value, 0) - FLOAT_ERROR
+						)}" y="0" width="${width + FLOAT_ERROR}" height="8" fill="${
+							colors[lang]
+						}" />`
+				)
+				.join("")}
+		</svg>
+		<div class="language-container grid">
+			${Object.entries(sortedPrimaryLanguages)
+				.slice(0, 12)
+				.map(
+					([lang, width]) => `<p class="language">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" height="12px" width="12px">
+					<ellipse cx="6" cy="6" rx="6" ry="6" fill="${colors[lang]}" />
+				</svg>
+				<span><b>${(Math.round((width / BAR_WIDTH) * 1000) / 10).toLocaleString(
+					"en"
+				)}%</b></span>
+				<span>${lang}</span>
+			</p>`
+				)
+				.join("")}
+		</div>`;
 
-		return new File([content], "global-info.svg", {
-			type: "image/svg+xml",
+		return new Svg({
+			HTMLContent: content,
+			stylesheet: path.join(process.cwd(), "public/styles/skills.css"),
+			filename: "skills.svg",
+			width: 480,
+			height: 340,
 		});
 	},
 	{
-		params: t.Object({ username: t.String() }),
+		response: t.File({
+			type: "image/svg+xml",
+		}),
 	}
 );

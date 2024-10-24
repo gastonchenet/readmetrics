@@ -1,0 +1,22 @@
+# Ignore all the dependencies and build files
+node_modules
+docker-compose*
+Dockerfile*
+
+# Ignore all the plugin files
+.gitignore
+.prettierignore
+.dockerignore
+
+# Ignore all the configuration files
+.git
+.editorconfig
+.vscode
+.idea
+
+# Ignore all the documentation files
+README.md
+LICENSE
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+SECURITY.md

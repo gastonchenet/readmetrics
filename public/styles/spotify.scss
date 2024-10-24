@@ -1,0 +1,50 @@
+@import "./variables.scss";
+
+.header {
+	display: flex;
+	align-items: center;
+	font-size: 16px;
+	gap: 0.4rem;
+
+	span {
+		color: $text-important-color;
+	}
+}
+
+.line {
+	margin-top: 0.6rem;
+	font-size: 14px;
+}
+
+.track-container {
+	display: flex;
+	flex-direction: column;
+	gap: 0.6rem;
+	margin-top: 0.6rem;
+
+	.track {
+		display: flex;
+		gap: 0.5rem;
+
+		.cover {
+			height: 26px;
+			width: 26px;
+			border-radius: 0.15rem;
+		}
+
+		.track-info {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+
+			.track-name {
+				font-size: 12px;
+				font-weight: 500;
+			}
+
+			.track-streams {
+				font-size: 10px;
+			}
+		}
+	}
+}

@@ -1,18 +1,38 @@
 {
   "name": "readmetrics",
-  "module": "./src/index.ts",
+  "version": "1.0.0",
+  "description": "ReadMetrics is a github metrics generator for your profile README.md",
+  "author": {
+    "name": "Gaston Chenet",
+    "email": "contact@gastonchenet.fr",
+    "url": "https://gastonchenet.fr"
+  },
   "type": "module",
+  "license": "MIT",
+  "main": "./src/index.ts",
+  "scripts": {
+    "start": "bun ./src/index.ts",
+    "test": "bun test --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gastonchenet/readmetrics.git"
+  },
+  "homepage": "https://github.com/gastonchenet/readmetrics#readme",
   "devDependencies": {
-    "@types/bun": "latest",
-    "sass": "^1.80.3"
+    "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@elysiajs/cors": "^1.1.1",
+    "@elysiajs/swagger": "^1.1.5",
     "elysia": "^1.1.22",
     "graphql-tag": "^2.12.6",
     "moment": "^2.30.1",
-    "octokit": "^4.0.2"
+    "octokit": "^4.0.2",
+    "sass": "^1.80.4",
+    "yaml": "^2.6.0"
   }
 }

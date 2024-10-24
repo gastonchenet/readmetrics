@@ -1,0 +1,13 @@
+# Rename this file to config.yml and fill the fields with your information
+
+# Gloal information for your github account
+github:
+  username:
+  token:
+
+# The port where the server will be running
+# Alse configure the port in the Dockerfile
+port: 3000
+
+# For the /spotify route
+spotify_username:

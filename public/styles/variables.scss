@@ -1,8 +1,12 @@
+$text-color: #97979c;
+$text-important-color: #2e87c9;
+
 * {
 	font-family: Arial, sans-serif;
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
+	color: $text-color;
 }
 
 b,
@@ -12,7 +16,7 @@ h3,
 h4,
 h5,
 h6 {
-	color: #2e87c9;
+	color: $text-important-color;
 }
 
 b {
