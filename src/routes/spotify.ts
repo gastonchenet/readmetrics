@@ -52,7 +52,7 @@ export default new Elysia({ prefix: "/spotify" }).get(
 			stylesheet: path.join(process.cwd(), "public/styles/spotify.css"),
 			filename: "spotify.svg",
 			width: 480,
-			height: 250,
+			height: 270,
 		});
 	},
 	{
