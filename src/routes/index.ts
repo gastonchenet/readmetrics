@@ -51,7 +51,7 @@ export default new Elysia({ prefix: "/api" })
         </p>
         <p class="line">
           ${await loadIcon("starred")}
-          <span><b>${user.starredRepositories.totalCount.toLocaleString()}</b> starred</span>
+          <span><b>${user.starredRepositories.totalCount.toLocaleString()}</b> starred repositories</span>
         </p>
       </section>
       <section>

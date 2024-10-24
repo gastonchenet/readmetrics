@@ -10,7 +10,7 @@ export type GlobalInfoWeek = {
 export type GlobalInfo = {
 	error?: { message: string };
 	data: {
-		user: {
+		viewer: {
 			name: string;
 			avatarUrl: string;
 			createdAt: string;
@@ -33,7 +33,7 @@ export type GlobalInfo = {
 export type Skills = {
 	error?: { message: string };
 	data: {
-		user: {
+		viewer: {
 			name: string;
 			repositories: {
 				nodes: {
@@ -94,43 +94,43 @@ export type SpotifyInfo = {
 export default class User {
 	public static async getGlobalInfo() {
 		const query = gql`
-      query {
-        user(login: "${Config.GITHUB_USERNAME}") {
-          name
-          avatarUrl
-          createdAt
-          location
-          repositories {
-            totalCount
-          }
-          pullRequests {
-            totalCount
-          }
-          issues {
-            totalCount
-          }
-          followers {
-            totalCount
-          }
-          following {
-            totalCount
-          }
-          starredRepositories {
-            totalCount
-          }
-          contributionsCollection {
-            contributionCalendar {
-              weeks {
-                contributionDays {
-                  contributionCount
-                }
-                firstDay
-              }
-            }
-          }
-        }
-      }
-    `;
+			query {
+				viewer {
+					name
+					avatarUrl
+					createdAt
+					location
+					repositories {
+						totalCount
+					}
+					pullRequests {
+						totalCount
+					}
+					issues {
+						totalCount
+					}
+					followers {
+						totalCount
+					}
+					following {
+						totalCount
+					}
+					starredRepositories {
+						totalCount
+					}
+					contributionsCollection {
+						contributionCalendar {
+							weeks {
+								contributionDays {
+									contributionCount
+								}
+								firstDay
+							}
+						}
+					}
+				}
+			}
+		`;
 
 		const response = await fetch("https://api.github.com/graphql", {
 			method: "POST",
@@ -145,35 +145,35 @@ export default class User {
 			return null;
 		}
 
-		return json?.data?.user ?? null;
+		return json?.data?.viewer ?? null;
 	}
 
 	public static async getSkills() {
 		const query = gql`
-      query {
-        user(login: "${Config.GITHUB_USERNAME}") {
-          name
-          repositories(first: 100, ownerAffiliations: OWNER) {
-            nodes {
-              primaryLanguage {
-                name
-                color
-              }
-              languages(first: 100, orderBy: { field: SIZE, direction: DESC }) {
-                totalSize
-                edges {
-                  size
-                  node {
-                    name
-                    color
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    `;
+			query {
+				viewer {
+					name
+					repositories(first: 100, ownerAffiliations: OWNER) {
+						nodes {
+							primaryLanguage {
+								name
+								color
+							}
+							languages(first: 100, orderBy: { field: SIZE, direction: DESC }) {
+								totalSize
+								edges {
+									size
+									node {
+										name
+										color
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		`;
 
 		const response = await fetch("https://api.github.com/graphql", {
 			method: "POST",
@@ -188,7 +188,7 @@ export default class User {
 			return null;
 		}
 
-		return json?.data?.user ?? null;
+		return json?.data?.viewer ?? null;
 	}
 
 	public static async getSpotifyInfo() {
@@ -210,5 +210,29 @@ export default class User {
 		}
 
 		return json;
+	}
+
+	public static async getTopics() {
+		const query = gql`
+			query {
+				viewer {
+				}
+			}
+		`;
+
+		const response = await fetch("https://api.github.com/graphql", {
+			method: "POST",
+			headers: { Authorization: `bearer ${Config.GITHUB_TOKEN}` },
+			body: JSON.stringify({ query: query.loc!.source.body }),
+		});
+
+		const json = await response.json();
+
+		if (json.error) {
+			console.error(json.error.message);
+			return null;
+		}
+
+		return json?.data?.user ?? null;
 	}
 }
