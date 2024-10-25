@@ -1,14 +1,14 @@
 import Elysia from "elysia";
 import swagger from "@elysiajs/swagger";
+import cors from "@elysiajs/cors";
 import routes from "./routes";
 import Config from "./classes/Config";
-import cors from "@elysiajs/cors";
 
 await Config.load();
 
 new Elysia()
-	.use(cors({ origin: "*" }))
-	.use(swagger())
+	.use(cors({ origin: "*", methods: ["GET"] }))
+	.use(swagger({ path: "/docs" }))
 	.onAfterHandle(({ request }) => {
 		console.log(`[${request.method}] ${new URL(request.url).pathname}`);
 	})

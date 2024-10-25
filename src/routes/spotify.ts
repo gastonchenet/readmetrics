@@ -57,7 +57,7 @@ export default new Elysia({ prefix: "/spotify" }).get(
 	},
 	{
 		response: t.File({
-			type: "image/svg+xml",
+			type: "image/svg",
 		}),
 	}
 );

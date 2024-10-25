@@ -15,7 +15,10 @@ export type GlobalInfo = {
 			avatarUrl: string;
 			createdAt: string;
 			location: string;
-			repositories: { totalCount: number };
+			repositories: {
+				totalCount: number;
+				nodes: { stargazerCount: number; forkCount: number }[];
+			};
 			pullRequests: { totalCount: number };
 			issues: { totalCount: number };
 			followers: { totalCount: number };
@@ -91,6 +94,22 @@ export type SpotifyInfo = {
 	}[];
 };
 
+export type Licenses = {
+	error?: { message: string };
+	data: {
+		viewer: {
+			repositories: {
+				nodes: {
+					licenseInfo: {
+						name: string;
+						permissions: { label: string }[];
+					};
+				}[];
+			};
+		};
+	};
+};
+
 export default class User {
 	public static async getGlobalInfo() {
 		const query = gql`
@@ -100,8 +119,17 @@ export default class User {
 					avatarUrl
 					createdAt
 					location
-					repositories {
+					repositories(
+						first: 100
+						ownerAffiliations: OWNER
+						visibility: PUBLIC
+						orderBy: { field: STARGAZERS, direction: DESC }
+					) {
 						totalCount
+						nodes {
+							stargazerCount
+							forkCount
+						}
 					}
 					pullRequests {
 						totalCount
@@ -153,7 +181,11 @@ export default class User {
 			query {
 				viewer {
 					name
-					repositories(first: 100, ownerAffiliations: OWNER) {
+					repositories(
+						first: 100
+						ownerAffiliations: OWNER
+						visibility: PUBLIC
+					) {
 						nodes {
 							primaryLanguage {
 								name
@@ -212,10 +244,54 @@ export default class User {
 		return json;
 	}
 
-	public static async getTopics() {
+	public static async getTopics() {}
+
+	public static async getLicenses() {
 		const query = gql`
 			query {
 				viewer {
+					repositories(
+						first: 100
+						visibility: PUBLIC
+						ownerAffiliations: OWNER
+					) {
+						nodes {
+							licenseInfo {
+								name
+								permissions {
+									label
+								}
+							}
+						}
+					}
+				}
+			}
+		`;
+
+		const response = await fetch("https://api.github.com/graphql", {
+			method: "POST",
+			headers: { Authorization: `bearer ${Config.GITHUB_TOKEN}` },
+			body: JSON.stringify({ query: query.loc!.source.body }),
+		});
+
+		const json: Licenses = await response.json();
+
+		if (json.error) {
+			console.error(json.error.message);
+			return null;
+		}
+
+		return json?.data?.viewer ?? null;
+	}
+
+	public static async getRepository(repoName: string) {
+		const query = gql`
+			query {
+				viewer {
+					repository(name: "${repoName}") {
+						name
+						description
+					}
 				}
 			}
 		`;
@@ -233,6 +309,6 @@ export default class User {
 			return null;
 		}
 
-		return json?.data?.user ?? null;
+		return json?.data?.viewer ?? null;
 	}
 }

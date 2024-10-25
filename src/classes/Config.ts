@@ -18,8 +18,7 @@ export default class Config {
 
 		const config = YAML.parse(await file.text());
 
-		Config.GITHUB_USERNAME = config.github.username;
-		Config.GITHUB_TOKEN = config.github.token;
+		Config.GITHUB_TOKEN = config.github_token;
 		Config.PORT = config.port;
 		Config.SPOTIFY_USERNAME = config.spotify_username;
 

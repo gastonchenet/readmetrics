@@ -11,10 +11,14 @@ import viewProfile from "../utils/viewProfile";
 import Config from "../classes/Config";
 import loadIcon from "../utils/loadIcon";
 import spotify from "./spotify";
+import topics from "./topics";
+import licenses from "./licenses";
 
-export default new Elysia({ prefix: "/api" })
+export default new Elysia()
 	.use(skills)
 	.use(spotify)
+	.use(topics)
+	.use(licenses)
 	.get(
 		"/",
 		async ({ set }) => {
@@ -53,6 +57,12 @@ export default new Elysia({ prefix: "/api" })
           ${await loadIcon("starred")}
           <span><b>${user.starredRepositories.totalCount.toLocaleString()}</b> starred repositories</span>
         </p>
+        <p class="line">
+          ${await loadIcon("starred")}
+          <span><b>${user.repositories.nodes
+						.reduce((acc, repo) => acc + repo.stargazerCount, 0)
+						.toLocaleString()}</b> stargazers</span>
+        </p>
       </section>
       <section>
         <p class="line">
@@ -66,6 +76,12 @@ export default new Elysia({ prefix: "/api" })
         <p class="line">
           ${await loadIcon("pull")}
           <span><b>${user.pullRequests.totalCount.toLocaleString()}</b> pull requests</span>
+        </p>
+        <p class="line">
+          ${await loadIcon("fork")}
+          <span><b>${user.repositories.nodes
+						.reduce((acc, repo) => acc + repo.forkCount, 0)
+						.toLocaleString()}</b> forks</span>
         </p>
         <p class="line">
           ${await loadIcon("issues")}
@@ -93,12 +109,12 @@ export default new Elysia({ prefix: "/api" })
 				filename: "global.svg",
 				stylesheet: path.join(process.cwd(), "public/styles/main.css"),
 				width: 480,
-				height: 200,
+				height: 210,
 			});
 		},
 		{
 			response: t.File({
-				type: "image/svg+xml",
+				type: "image/svg",
 				title: "Global Info",
 			}),
 		}

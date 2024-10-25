@@ -169,7 +169,7 @@ export default new Elysia({ prefix: "/skills" }).get(
 	},
 	{
 		response: t.File({
-			type: "image/svg+xml",
+			type: "image/svg",
 		}),
 	}
 );

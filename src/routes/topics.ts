@@ -3,6 +3,9 @@ import User from "../classes/User";
 
 export default new Elysia({ prefix: "/topics" }).get(
 	"/",
-	async ({ set }) => {},
+	async ({ set }) => {
+		const topics = await User.getTopics();
+		console.log(topics);
+	},
 	{}
 );
