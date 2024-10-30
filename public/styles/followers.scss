@@ -1,0 +1,35 @@
+@import "./variables.scss";
+
+.header {
+	color: $text-important-color;
+	font-size: 16px;
+	margin-bottom: 0.8rem;
+}
+
+.line {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	font-size: 14px;
+	margin-bottom: 0.3rem;
+
+	&.label {
+		color: $text-important-color;
+		margin-block: 0.8rem 0.4rem;
+		font-size: 15px;
+	}
+}
+
+.followers {
+	margin-top: 0.6rem;
+	display: grid;
+	width: fit-content;
+	grid-template-columns: repeat(10, 1fr);
+	gap: 0.4rem;
+
+	.avatar {
+		height: 35px;
+		width: 35px;
+		border-radius: 50%;
+	}
+}

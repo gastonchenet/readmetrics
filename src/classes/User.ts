@@ -110,19 +110,13 @@ export type Licenses = {
 	};
 };
 
-export type Collaborators = {
+export type Followers = {
 	error?: { message: string };
 	data: {
 		viewer: {
-			repositories: {
-				nodes: {
-					collaborators: {
-						nodes: {
-							avatarUrl: string;
-							contributionsCollection: { totalRepositoryContributions: number };
-						}[];
-					};
-				}[];
+			followers: {
+				totalCount: number;
+				nodes: { avatarUrl: string }[];
 			};
 		};
 	};
@@ -262,29 +256,14 @@ export default class User {
 		return json;
 	}
 
-	public static async getCollaborators() {
+	public static async getFollowers() {
 		const query = gql`
 			query {
 				viewer {
-					login
-					repositories(
-						first: 100
-						visibility: PUBLIC
-						ownerAffiliations: OWNER
-					) {
+					followers(first: 20) {
+						totalCount
 						nodes {
-							collaborators {
-								nodes {
-									login
-									avatarUrl
-									contributionsCollection {
-										totalCommitContributions
-										totalPullRequestContributions
-										totalPullRequestReviewContributions
-										totalIssueContributions
-									}
-								}
-							}
+							avatarUrl
 						}
 					}
 				}
@@ -297,7 +276,7 @@ export default class User {
 			body: JSON.stringify({ query: query.loc!.source.body }),
 		});
 
-		const json: Collaborators = await response.json();
+		const json: Followers = await response.json();
 
 		if (json.error) {
 			console.error(json.error.message);

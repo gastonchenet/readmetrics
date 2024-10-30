@@ -11,16 +11,14 @@ import viewProfile from "../utils/viewProfile";
 import Config from "../classes/Config";
 import loadIcon from "../utils/loadIcon";
 import spotify from "./spotify";
-import topics from "./topics";
 import licenses from "./licenses";
-import collaborators from "./collaborators";
+import followers from "./followers";
 
 export default new Elysia()
 	.use(skills)
 	.use(spotify)
-	.use(topics)
 	.use(licenses)
-	.use(collaborators)
+	.use(followers)
 	.get(
 		"/",
 		async ({ set }) => {
