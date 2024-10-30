@@ -101,8 +101,26 @@ export type Licenses = {
 			repositories: {
 				nodes: {
 					licenseInfo: {
-						name: string;
+						spdxId: string;
 						permissions: { label: string }[];
+					};
+				}[];
+			};
+		};
+	};
+};
+
+export type Collaborators = {
+	error?: { message: string };
+	data: {
+		viewer: {
+			repositories: {
+				nodes: {
+					collaborators: {
+						nodes: {
+							avatarUrl: string;
+							contributionsCollection: { totalRepositoryContributions: number };
+						}[];
 					};
 				}[];
 			};
@@ -244,6 +262,51 @@ export default class User {
 		return json;
 	}
 
+	public static async getCollaborators() {
+		const query = gql`
+			query {
+				viewer {
+					login
+					repositories(
+						first: 100
+						visibility: PUBLIC
+						ownerAffiliations: OWNER
+					) {
+						nodes {
+							collaborators {
+								nodes {
+									login
+									avatarUrl
+									contributionsCollection {
+										totalCommitContributions
+										totalPullRequestContributions
+										totalPullRequestReviewContributions
+										totalIssueContributions
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		`;
+
+		const response = await fetch("https://api.github.com/graphql", {
+			method: "POST",
+			headers: { Authorization: `bearer ${Config.GITHUB_TOKEN}` },
+			body: JSON.stringify({ query: query.loc!.source.body }),
+		});
+
+		const json: Collaborators = await response.json();
+
+		if (json.error) {
+			console.error(json.error.message);
+			return null;
+		}
+
+		return json?.data?.viewer ?? null;
+	}
+
 	public static async getTopics() {}
 
 	public static async getLicenses() {
@@ -257,7 +320,7 @@ export default class User {
 					) {
 						nodes {
 							licenseInfo {
-								name
+								spdxId
 								permissions {
 									label
 								}

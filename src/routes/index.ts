@@ -13,12 +13,14 @@ import loadIcon from "../utils/loadIcon";
 import spotify from "./spotify";
 import topics from "./topics";
 import licenses from "./licenses";
+import collaborators from "./collaborators";
 
 export default new Elysia()
 	.use(skills)
 	.use(spotify)
 	.use(topics)
 	.use(licenses)
+	.use(collaborators)
 	.get(
 		"/",
 		async ({ set }) => {

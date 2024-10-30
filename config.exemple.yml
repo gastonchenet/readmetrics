@@ -1,13 +1,13 @@
 # Rename this file to config.yml and fill the fields with your information
 
-# Gloal information for your github account
-github:
-  username:
-  token:
+# The GitHub token for your account
+github_token:
 
 # The port where the server will be running
-# Alse configure the port in the Dockerfile
 port: 3000
+
+# The WakaTime API Key for your account
+wakatime_api_key:
 
 # For the /spotify route
 spotify_username:

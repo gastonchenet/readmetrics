@@ -3,6 +3,7 @@ import weekColor from "../src/utils/weekColor";
 import secureHTML from "../src/utils/secureHTML";
 import formatBytes from "../src/utils/formatBytes";
 import loadIcon from "../src/utils/loadIcon";
+import hslToHex from "../src/utils/hslToHex";
 
 test("Week Color", () => {
 	expect(
@@ -82,4 +83,12 @@ test("Icon Loading", async () => {
 	expect(async () => {
 		await loadIcon(Math.random().toString());
 	}).toThrow(Error);
+});
+
+test("HSL to Hex", () => {
+	expect(hslToHex(Math.random() * 360, 100, 50)).toMatch(/#[0-9a-f]{6}/);
+
+	expect(hslToHex(0, 100, 50)).toBe("#ff0000");
+	expect(hslToHex(120, 100, 50)).toBe("#00ff00");
+	expect(hslToHex(240, 100, 50)).toBe("#0000ff");
 });

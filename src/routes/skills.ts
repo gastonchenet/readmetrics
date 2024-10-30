@@ -4,15 +4,7 @@ import User from "../classes/User";
 import Svg from "../classes/Svg";
 import formatBytes from "../utils/formatBytes";
 import loadIcon from "../utils/loadIcon";
-
-type Language = {
-	width: number;
-	lines: number;
-	color: string;
-};
-
-const BAR_WIDTH = 460;
-const FLOAT_ERROR = 1;
+import makeProgressBar from "../utils/makeProgressBar";
 
 export default new Elysia({ prefix: "/skills" }).get(
 	"/",
@@ -60,29 +52,20 @@ export default new Elysia({ prefix: "/skills" }).get(
 			}
 		}
 
-		const primaryLanguagesWidth: Record<string, number> = {};
-		const languagesWidth: Record<string, Language> = {};
-
-		for (const lang in primaryLanguages) {
-			primaryLanguagesWidth[lang] =
-				(primaryLanguages[lang] / totalPrimarySize) * BAR_WIDTH;
-		}
-
-		for (const lang in languages) {
-			languagesWidth[lang] = {
-				width: (languages[lang] / totalSize) * BAR_WIDTH,
+		const primaryLanguagesProps = Object.entries(primaryLanguages).map(
+			([lang, size]) => ({
+				lang,
+				prop: size / totalPrimarySize,
 				color: colors[lang],
-				lines: languages[lang],
-			};
-		}
-
-		const sortedPrimaryLanguages = Object.fromEntries(
-			Object.entries(primaryLanguagesWidth).sort((a, b) => b[1] - a[1])
+			})
 		);
 
-		const sortedLanguages = Object.fromEntries(
-			Object.entries(languagesWidth).sort((a, b) => b[1].lines - a[1].lines)
-		);
+		const languagesProps = Object.entries(languages).map(([lang, size]) => ({
+			lang,
+			size,
+			prop: size / totalSize,
+			color: colors[lang],
+		}));
 
 		const content = `<h2 class="title">
 			${user.name}'s skills
@@ -91,34 +74,18 @@ export default new Elysia({ prefix: "/skills" }).get(
 			${await loadIcon("starred")}
 			<span>Most used languages</span>
 		</p>
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${BAR_WIDTH} 8" width="${BAR_WIDTH}" height="8px">
-			${Object.entries(sortedLanguages)
-				.map(
-					([lang, { width }], index) =>
-						`<rect x="${Math.max(
-							0,
-							Object.entries(sortedLanguages)
-								.slice(0, index)
-								.reduce((acc, [_, value]) => acc + value.width, 0) - FLOAT_ERROR
-						)}" y="0" width="${width + FLOAT_ERROR}" height="8" fill="${
-							colors[lang]
-						}" />`
-				)
-				.join("")}
-		</svg>
+		${makeProgressBar(languagesProps)}
 		<div class="language-container">
-			${Object.entries(sortedLanguages)
+			${languagesProps
 				.slice(0, 4)
 				.map(
-					([lang, { width, lines, color }]) => `<p class="language">
+					({ lang, prop, size, color }) => `<p class="language">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" height="12px" width="12px">
 					<ellipse cx="6" cy="6" rx="6" ry="6" fill="${color}" />
 				</svg>
-				<span><b>${(Math.round((width / BAR_WIDTH) * 1000) / 10).toLocaleString(
-					"en"
-				)}%</b></span>
+				<span><b>${(Math.round(prop * 1000) / 10).toLocaleString("en")}%</b></span>
 				<span>${lang}</span>
-				<span class="size">${formatBytes(lines)}</span>
+				<span class="size">${formatBytes(size)}</span>
 			</p>`
 				)
 				.join("")}
@@ -127,32 +94,16 @@ export default new Elysia({ prefix: "/skills" }).get(
 			${await loadIcon("repo")}
 			<span>Most used project main languages</span>
 		</p>
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${BAR_WIDTH} 8" width="${BAR_WIDTH}" height="8px">
-			${Object.entries(sortedPrimaryLanguages)
-				.map(
-					([lang, width], index) =>
-						`<rect x="${Math.max(
-							0,
-							Object.entries(sortedPrimaryLanguages)
-								.slice(0, index)
-								.reduce((acc, [_, value]) => acc + value, 0) - FLOAT_ERROR
-						)}" y="0" width="${width + FLOAT_ERROR}" height="8" fill="${
-							colors[lang]
-						}" />`
-				)
-				.join("")}
-		</svg>
+		${makeProgressBar(primaryLanguagesProps)}
 		<div class="language-container grid">
-			${Object.entries(sortedPrimaryLanguages)
+			${primaryLanguagesProps
 				.slice(0, 12)
 				.map(
-					([lang, width]) => `<p class="language">
+					({ lang, color, prop }) => `<p class="language">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" height="12px" width="12px">
-					<ellipse cx="6" cy="6" rx="6" ry="6" fill="${colors[lang]}" />
+					<ellipse cx="6" cy="6" rx="6" ry="6" fill="${color}" />
 				</svg>
-				<span><b>${(Math.round((width / BAR_WIDTH) * 1000) / 10).toLocaleString(
-					"en"
-				)}%</b></span>
+				<span><b>${(Math.round(prop * 1000) / 10).toLocaleString("en")}%</b></span>
 				<span>${lang}</span>
 			</p>`
 				)
