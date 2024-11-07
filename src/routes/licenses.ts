@@ -131,10 +131,10 @@ export default new Elysia({ prefix: "/licenses" }).get(
 
 		return new Svg({
 			HTMLContent: content,
-			stylesheet: path.join(process.cwd(), "public/styles/licenses.css"),
+			stylesheet: path.join(process.cwd(), "public/styles/licenses.scss"),
 			filename: "licenses.svg",
 			width: 480,
-			height: 340,
+			height: 300,
 		});
 	},
 	{

@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { compile } from "sass";
 
 type SvgOptions = {
 	HTMLContent: string;
@@ -21,7 +22,7 @@ export default class Svg extends File {
 		}
 
 		const content = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
-      <style>${fs.readFileSync(stylesheet, "utf8")}</style>
+      <style>${compile(stylesheet, { style: "compressed" }).css}</style>
       <foreignObject x="0" y="0" width="100%" height="100%">
         <div xmlns="http://www.w3.org/1999/xhtml" class="container">${HTMLContent}</div>
       </foreignObject>

@@ -1,0 +1,9 @@
+@import "./variables.scss";
+
+.contributors {
+	display: grid;
+
+	.avatar {
+		border-radius: 50%;
+	}
+}

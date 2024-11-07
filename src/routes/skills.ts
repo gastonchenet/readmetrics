@@ -112,10 +112,10 @@ export default new Elysia({ prefix: "/skills" }).get(
 
 		return new Svg({
 			HTMLContent: content,
-			stylesheet: path.join(process.cwd(), "public/styles/skills.css"),
+			stylesheet: path.join(process.cwd(), "public/styles/skills.scss"),
 			filename: "skills.svg",
 			width: 480,
-			height: 340,
+			height: 320,
 		});
 	},
 	{

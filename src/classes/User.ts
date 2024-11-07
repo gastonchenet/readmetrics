@@ -122,6 +122,19 @@ export type Followers = {
 	};
 };
 
+export type Contributors = {
+	error?: { message: string };
+	data: {
+		viewer: {
+			repository: {
+				mentionableUsers: {
+					nodes: { avatarUrl: string }[];
+				};
+			};
+		};
+	};
+};
+
 export default class User {
 	public static async getGlobalInfo() {
 		const query = gql`
@@ -352,5 +365,36 @@ export default class User {
 		}
 
 		return json?.data?.viewer ?? null;
+	}
+
+	public static async getContributors(repoName: string) {
+		const query = gql`
+			query {
+				viewer {
+					repository(name: "${repoName}") {
+						mentionableUsers(first: 100) {
+							nodes {
+								avatarUrl
+							}
+						}
+					}
+				}
+			}
+		`;
+
+		const response = await fetch("https://api.github.com/graphql", {
+			method: "POST",
+			headers: { Authorization: `bearer ${Config.GITHUB_TOKEN}` },
+			body: JSON.stringify({ query: query.loc!.source.body }),
+		});
+
+		const json: Contributors = await response.json();
+
+		if (json.error) {
+			console.error(json.error.message);
+			return null;
+		}
+
+		return json?.data?.viewer?.repository?.mentionableUsers ?? null;
 	}
 }

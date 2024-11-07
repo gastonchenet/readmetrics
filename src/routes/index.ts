@@ -13,12 +13,14 @@ import loadIcon from "../utils/loadIcon";
 import spotify from "./spotify";
 import licenses from "./licenses";
 import followers from "./followers";
+import repository from "./repository";
 
 export default new Elysia()
 	.use(skills)
 	.use(spotify)
 	.use(licenses)
 	.use(followers)
+	.use(repository)
 	.get(
 		"/",
 		async ({ set }) => {
@@ -107,15 +109,14 @@ export default new Elysia()
 			return new Svg({
 				HTMLContent: content,
 				filename: "global.svg",
-				stylesheet: path.join(process.cwd(), "public/styles/main.css"),
+				stylesheet: path.join(process.cwd(), "public/styles/main.scss"),
 				width: 480,
-				height: 210,
+				height: 220,
 			});
 		},
 		{
 			response: t.File({
 				type: "image/svg",
-				title: "Global Info",
 			}),
 		}
 	);

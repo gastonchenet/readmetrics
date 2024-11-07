@@ -37,10 +37,10 @@ export default new Elysia({ prefix: "/followers" }).get(
 
 		return new Svg({
 			HTMLContent: content,
-			stylesheet: path.join(process.cwd(), "public/styles/followers.css"),
+			stylesheet: path.join(process.cwd(), "public/styles/followers.scss"),
 			filename: "followers.svg",
 			width: 480,
-			height: 210,
+			height: 160,
 		});
 	},
 	{
